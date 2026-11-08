@@ -1,6 +1,6 @@
 import time
 import random
-from influxdb_client_3 import InfluxDBClient3, Point
+from influxdb_client import InfluxDBClient, Point
 
 HOST = "http://localhost:8086"
 TOKEN = "EFWerM3TXUxogUZ78D1AL_dqC4RNJhIkvO1DhSJkXT40DMWtZfVsvOWbZ0ilKCIxQHU_1S7YZewNMEdhxvL_VQ=="
@@ -11,7 +11,7 @@ DEVICES = ["router1", "router2"]
 
 print("Ingestando telemetría de red ({', '.join(DEVICES)}) en la base de datos '{DATABASE}'...")
 
-client = InfluxDBClient3(host=HOST, token=TOKEN, org=ORG, database=DATABASE)
+client = InfluxDBClient(host=HOST, token=TOKEN, org=ORG, database=DATABASE)
 
 try:
     while True:
