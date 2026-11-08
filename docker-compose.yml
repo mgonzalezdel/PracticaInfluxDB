@@ -1,0 +1,32 @@
+services:
+  influxdb:
+    image: influxdb:3-core
+    container_name: iot-influxdb3
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb3_data:/var/lib/influxdb3
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin12345
+      - DOCKER_INFLUXDB_INIT_ORG=iespsur
+      - DOCKER_INFLUXDB_INIT_BUCKET=trafico_raw
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=EFWerM3TXUxogUZ78D1AL_dqC4RNJhIkvO1DhSJkXT40DMWtZfVsvOWbZ0ilKCIxQHU_1S7YZewNMEdhxvL_VQ==
+
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: iot-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb3_data:
+  grafana_data:
