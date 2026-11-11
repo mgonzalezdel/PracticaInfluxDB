@@ -1,28 +1,43 @@
 services:
-  influxdb: 
-    image: influxdb:3-core 
-    container_name: iot-influxdb3 
-    command: serve --node-id node1
-    ports: 
-      - "8086:8086" 
-    volumes: 
-      - influxdb3_data:/var/lib/influxdb3 
-    environment: 
-      - INFLUXDB3_ADMIN_TOKEN=EFWerM3TXUxogUZ78D1AL_dqC4RNJhIkvO1DhSJkXT40DMWtZfVsvOWbZ0ilKCIxQHU_1S7YZewNMEdhxvL_VQ==
+  influxdb3:
+    image: influxdb:3-core
+    container_name: influxdb3
+    restart: unless-stopped
+    ports:
+      - "8181:8181"
+    command:
+      - influxdb3
+      - serve
+      - --node-id=node0
+      - --object-store=file
+      - --data-dir=/var/lib/influxdb3/data
+      - --plugin-dir=/var/lib/influxdb3/plugins
+      - --without-auth
+    volumes:
+      - ./influxdb3/data:/var/lib/influxdb3/data
+      - ./influxdb3/plugins:/var/lib/influxdb3/plugins
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    restart: unless-stopped
+    depends_on:
+      - influxdb3
+    ports:
+      - "8186:8186"
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
   grafana:
-    image: grafana/grafana:10.3.1
-    container_name: iot-grafana
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    restart: unless-stopped
+    depends_on:
+      - influxdb3
     ports:
       - "3000:3000"
     volumes:
-      - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - influxdb
+      - grafana-data:/var/lib/grafana
 
 volumes:
-  influxdb3_data:
-  grafana_data:
+  grafana-data:
