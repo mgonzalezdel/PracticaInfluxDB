@@ -1,37 +1,28 @@
-import time
-import random
-from influxdb_client import InfluxDBClient, Point
+import time, random, sys
+from influxdb3_client import InfluxDBClient3, Point
 
-HOST = "http://localhost:8086"
-TOKEN = "EFWerM3TXUxogUZ78D1AL_dqC4RNJhIkvO1DhSJkXT40DMWtZfVsvOWbZ0ilKCIxQHU_1S7YZewNMEdhxvL_VQ=="
-ORG = "iespsur"
-DATABASE = "trafico_raw"
+HOST = 'http://localhost:8181'
+TOKEN = ''
+DATABASE = 'trafico_raw'
+DEVICES = ['router1', 'router2']
 
-DEVICES = ["router1", "router2"]
+def main():
+    print('Simulador InfluxDB 3 Core')
+    client = InfluxDBClient3(host=HOST, token=TOKEN, database=DATABASE)
+    try:
+        while True:
+            for dev in DEVICES:
+                tin = round(random.uniform(50.0, 200.0), 2)
+                tout = round(random.uniform(40.0, 180.0), 2)
+                lat = round(random.uniform(5.0, 50.0), 2)
+                p = Point('traffic').tag('device', dev).field('traffic_in', tin).field('traffic_out', tout).field('latency', lat)
+                client.write(record=p)
+                print(f'[{dev}] IN={tin} Mbps | OUT={tout} Mbps | Latencia={lat} ms')
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print('Detenido')
+    finally:
+        client.close()
 
-print("Ingestando telemetría de red ({', '.join(DEVICES)}) en la base de datos '{DATABASE}'...")
-
-client = InfluxDBClient(host=HOST, token=TOKEN, org=ORG, database=DATABASE)
-
-try:
-    while True:
-        for dev in DEVICES:
-
-            traffic_in = round(random.uniform(50.0, 200.0), 2)
-            traffic_out = round(random.uniform(40.0, 180.0), 2)
-            latency = round(random.uniform(5.0, 50.0), 2)
-            
-            p = (Point("traffic") \
-                .tag("device", dev) \
-                .field("traffic_in", traffic_in) \
-                .field("traffic_out", traffic_out) \
-                .field("latency", latency))
-            
-            client.write(p)
-            print(f"[{dev}] Ingestado -> IN: {traffic_in} Mbps | OUT={traffic_out} Mbps | Latencia: {latency} ms")
-
-        time.sleep(1) # Cada segundo
-
-except KeyboardInterrupt:
-    print("\n Simulación detenida por el usuario.")
-    client.close()
+if __name__ == '__main__':
+    main()
