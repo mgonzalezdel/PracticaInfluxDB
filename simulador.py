@@ -1,5 +1,5 @@
-import time, random, sys
-from influxdb3_client import InfluxDBClient3, Point
+import time, random
+from influxdb_client_3 import InfluxDBClient3, Point
 
 HOST = 'http://localhost:8181'
 TOKEN = ''
