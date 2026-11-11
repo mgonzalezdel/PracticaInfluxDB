@@ -17,17 +17,6 @@ services:
       - ./influxdb3/data:/var/lib/influxdb3/data
       - ./influxdb3/plugins:/var/lib/influxdb3/plugins
 
-  telegraf:
-    image: telegraf:latest
-    container_name: telegraf
-    restart: unless-stopped
-    depends_on:
-      - influxdb3
-    ports:
-      - "8186:8186"
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-
   grafana:
     image: grafana/grafana-oss:latest
     container_name: grafana
